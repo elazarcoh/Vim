@@ -304,3 +304,10 @@ export function RegisterAction(action: new () => BaseAction): void {
     actions.push(action);
   }
 }
+
+export function unregisterByName(name: string): void {
+  for (const [modeName, actions] of actionMap.entries()) {
+    const filtered = actions.filter((a) => a.name !== name);
+    actionMap.set(modeName, filtered);
+  }
+}

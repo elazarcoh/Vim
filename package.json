@@ -729,6 +729,54 @@
           "markdownDescription": "Whether to break through lines when using [n]ext/[l]ast motion",
           "default": true
         },
+        "vim.customTextObjects": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "properties": {
+              "objectKeys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "open": {
+                "type": "string"
+              },
+              "close": {
+                "type": "string"
+              },
+              "possiblyMultiline": {
+                "type": "boolean"
+              },
+              "supportsInside": {
+                "type": "boolean"
+              },
+              "supportsAround": {
+                "type": "boolean"
+              },
+              "includeOpenWhenAround": {
+                "type": "boolean"
+              },
+              "includeCloseWhenAround": {
+                "type": "boolean"
+              },
+              "languageIds": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "const": "*"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "vim.sneak": {
           "type": "boolean",
           "markdownDescription": "Enable the [Sneak](https://github.com/justinmk/vim-sneak) plugin for Vim.",

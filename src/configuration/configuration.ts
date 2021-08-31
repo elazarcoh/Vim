@@ -267,6 +267,8 @@ class Configuration implements IConfiguration {
     breakThroughLines: false,
   };
 
+  customTextObjects: object[] = [];
+
   autoSwitchInputMethod: IAutoSwitchInputMethod = {
     enable: false,
     defaultIM: '',

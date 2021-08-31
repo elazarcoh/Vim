@@ -19,6 +19,7 @@ import { taskQueue } from './src/taskQueue';
 import { Register, RegisterMode } from './src/register/register';
 import { SpecialKeys } from './src/util/specialKeys';
 import { HistoryTracker } from './src/history/historyTracker';
+import { userTextObjectRegistry } from './src/actions/plugins/targets/userTextObject';
 
 let extensionContext: vscode.ExtensionContext;
 let previousActiveEditorId: EditorIdentity | undefined;
@@ -103,6 +104,7 @@ async function loadConfiguration() {
 export async function activate(context: vscode.ExtensionContext, handleLocal: boolean = true) {
   // before we do anything else, we need to load the configuration
   await loadConfiguration();
+  await userTextObjectRegistry.updateFromConfig();
 
   const logger = Logger.get('Extension Startup');
   logger.debug('Start');
@@ -125,6 +127,7 @@ export async function activate(context: vscode.ExtensionContext, handleLocal: bo
     vscode.workspace.onDidChangeConfiguration,
     async () => {
       await loadConfiguration();
+      await userTextObjectRegistry.updateFromConfig();
     },
     false
   );
