@@ -27,7 +27,11 @@ import { sorted } from '../common/motion/position';
 import { WordType } from '../textobject/word';
 import { CommandInsertAtCursor } from './commands/actions';
 import { SearchDirection } from '../vimscript/pattern';
-import { SmartQuoteMatcher, WhichQuotes } from './plugins/targets/smartQuotesMatcher';
+import {
+  getSurroundingQuotes,
+  SmartQuoteMatcher,
+  WhichQuotes,
+} from './plugins/targets/smartQuotesMatcher';
 import { useSmartQuotes } from './plugins/targets/targetsConfig';
 
 /**
@@ -1724,6 +1728,16 @@ class MoveToMatchingBracket extends BaseMovement {
     position: Position,
     vimState: VimState
   ): Promise<Position | IMovement> {
+    // try quotes first
+    const quotesRange = getSurroundingQuotes(position, vimState.document, true);
+    if (quotesRange) {
+      if (quotesRange.range.end.isEqual(position)) {
+        return quotesRange.range.start;
+      } else if (quotesRange.range.start.isEqual(position)) {
+        return quotesRange.range.end;
+      }
+    }
+
     position = position.getLeftIfEOL();
 
     const lineText = vimState.document.lineAt(position).text;
@@ -1736,15 +1750,33 @@ class MoveToMatchingBracket extends BaseMovement {
       // we need to check pairing, because with text: bla |bla < blub > blub
       // this for loop will walk over bla and check for a pairing till it finds <
       if (pairing) {
-        // We found an opening char, now move to the matching closing char
-        return (
-          PairMatcher.nextPairedChar(
-            new Position(position.line, col),
-            lineText[col],
-            vimState,
-            false
-          ) || failure
-        );
+        // check if quotes pairing has higher precedence over the found pairing.
+        const inQuotes = quotesRange && quotesRange.range.contains(position);
+        if (
+          quotesRange &&
+          inQuotes &&
+          (quotesRange.range.start.character > col || quotesRange.range.end.character < col)
+        ) {
+          return quotesRange.range.end;
+        } else {
+          // We found an opening char, now move to the matching closing char
+          const opening = new Position(position.line, col);
+          const pair = PairMatcher.nextPairedChar(opening, lineText[col], vimState, false);
+          if (pair) {
+            // found a bracket pair. check if it has higher precedence than quotes.
+            const pairRange = new vscode.Range(opening, pair);
+            if (!quotesRange || inQuotes || pairRange.contains(position)) {
+              return pair;
+            } else if (pairRange.start.isBefore(quotesRange.range.start)) {
+              return pair;
+            } else {
+              return quotesRange.range.end;
+            }
+          } else if (quotesRange) {
+            return quotesRange.range.end;
+          }
+        }
+        return failure;
       }
     }
 

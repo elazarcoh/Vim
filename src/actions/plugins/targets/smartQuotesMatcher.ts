@@ -1,4 +1,4 @@
-import { Position } from 'vscode';
+import { Position, Range } from 'vscode';
 import { TextDocument } from 'vscode';
 import { configuration } from '../../../configuration/configuration';
 
@@ -364,4 +364,21 @@ export class SmartQuoteMatcher {
 
     return undefined;
   }
+}
+
+export function getSurroundingQuotes(
+  position: Position,
+  document: TextDocument,
+  allowOutOfRange: boolean = false
+): { type: Quote; range: Range } | undefined {
+  for (const type of ['"', "'", '`'] as Quote[]) {
+    const match = new SmartQuoteMatcher(type, document).smartSurroundingQuotes(position, 'current');
+    if (match) {
+      const range = new Range(match.start, match.stop);
+      if (allowOutOfRange || range.contains(position)) {
+        return { type, range };
+      }
+    }
+  }
+  return undefined;
 }
