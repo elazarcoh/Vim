@@ -4,6 +4,7 @@ import { BangCommand } from '../cmd_line/commands/bang';
 import { BufferDeleteCommand } from '../cmd_line/commands/bufferDelete';
 import { CloseCommand } from '../cmd_line/commands/close';
 import { CopyCommand } from '../cmd_line/commands/copy';
+import { CursorCommand } from '../cmd_line/commands/cursor';
 import { DeleteCommand } from '../cmd_line/commands/delete';
 import { DigraphsCommand } from '../cmd_line/commands/digraph';
 import { FileCommand } from '../cmd_line/commands/file';
@@ -173,6 +174,7 @@ export const builtinExCommands: ReadonlyArray<[[string, string], ArgParser | und
   [['cu', 'nmap'], undefined],
   [['cuna', 'bbrev'], undefined],
   [['cunme', 'nu'], undefined],
+  [['cur', 'sor'], CursorCommand.argParser],
   [['cw', 'indow'], undefined],
   [['d', 'elete'], DeleteCommand.argParser],
   [['deb', 'ug'], undefined],

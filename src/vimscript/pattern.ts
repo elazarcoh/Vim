@@ -65,9 +65,11 @@ export class Pattern {
     args:
       | {
           fromPosition: Position;
+          maxResults?: number;
         }
       | {
           lineRange: LineRange;
+          maxResults?: number;
         }
   ): PatternMatch[] {
     let fromPosition: Position;
@@ -137,6 +139,14 @@ export class Pattern {
           range: matchRange,
           groups: match,
         });
+
+        if (
+          args.maxResults !== undefined &&
+          matchRanges.beforeWrapping.length + matchRanges.afterWrapping.length >= args.maxResults
+        ) {
+          // TODO: Vim uses a timeout... we probably should too
+          break;
+        }
 
         if (
           matchRanges.beforeWrapping.length + matchRanges.afterWrapping.length >=
