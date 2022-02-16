@@ -144,7 +144,6 @@ export class Pattern {
           args.maxResults !== undefined &&
           matchRanges.beforeWrapping.length + matchRanges.afterWrapping.length >= args.maxResults
         ) {
-          // TODO: Vim uses a timeout... we probably should too
           break;
         }
 
@@ -199,6 +198,7 @@ export class Pattern {
     direction: SearchDirection;
     ignoreSmartcase?: boolean;
     delimiter?: string;
+    additionalParsers?: Array<Parser<string>>;
   }): Parser<Pattern> {
     const delimiter = args.delimiter
       ? args.delimiter
@@ -208,6 +208,7 @@ export class Pattern {
     // TODO: Some escaped characters need special treatment
     return seqMap(
       alt(
+        ...(args.additionalParsers ?? []),
         string('\\%V').map((_) => ({ inSelection: true })),
         string('$').map(() => '(?:$(?<!\\r))'), // prevents matching \r\n as two lines
         string('^').map(() => '(?:^(?<!\\r))'), // prevents matching \r\n as two lines
