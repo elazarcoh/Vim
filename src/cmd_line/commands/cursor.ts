@@ -1,8 +1,7 @@
 import { escapeRegExp } from 'lodash';
-import { optWhitespace, Parser, seq, string, whitespace } from 'parsimmon';
+import { optWhitespace, Parser, seq, string, whitespace, eof } from 'parsimmon';
 import { Position } from 'vscode';
 import { Cursor } from '../../common/motion/cursor';
-import { configuration } from '../../configuration/configuration';
 import { isVisualMode, Mode } from '../../mode/mode';
 import { VimState } from '../../state/vimState';
 import { TextEditor } from '../../textEditor';
@@ -25,16 +24,13 @@ export class CursorCommand extends ExCommand {
   public static readonly argParser: Parser<CursorCommand> = optWhitespace
     .then(
       seq(
-        numberParser.fallback(-1),
-        whitespace
-          .then(
-            Pattern.parser({
-              direction: SearchDirection.Forward,
-              additionalParsers: [
-                string(CursorCommand.CURSOR_HERE).map(() => CursorCommand.CURSOR_LOCATION_REGEX),
-              ],
-            })
-          )
+        numberParser.skip(whitespace.or(eof)).fallback(-1),
+        Pattern.parser({
+          direction: SearchDirection.Forward,
+          additionalParsers: [
+            string(CursorCommand.CURSOR_HERE).map(() => CursorCommand.CURSOR_LOCATION_REGEX),
+          ],
+        })
           .map((p) => (p.patternString.length === 0 ? undefined : p))
           .fallback(undefined) // fallback to undefined if pattern is empty, so we can use current word/selection as pattern
       )
@@ -98,7 +94,7 @@ function patternFromCurrentSelection(vimState: VimState): Pattern {
   if (
     vimState.currentMode === Mode.CommandlineInProgress && // should always be true
     'commandLine' in vimState.modeData && // should always be true, given the previous line
-    isVisualMode(vimState.modeData['commandLine'].previousMode) // the only interesting part of the condition
+    isVisualMode(vimState.modeData.commandLine.previousMode) // the only interesting part of the condition
   ) {
     needle = vimState.document.getText(vimState.editor.selection);
     isExact = false;
