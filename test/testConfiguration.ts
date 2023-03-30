@@ -28,6 +28,11 @@ export class Configuration implements IConfiguration {
   sneak = false;
   sneakUseIgnorecaseAndSmartcase = false;
   sneakReplacesF = false;
+  leap = false;
+  leapShowMarkerPosition: 'after' | 'target' = 'after';
+  leapLabels = 'sklyuiopnm,qwertzxcvbahdgjf;';
+  leapCaseSensitive = false;
+  leapBidirectionalSearch = false;
   surround = false;
   argumentObjectSeparators = [','];
   argumentObjectOpeningDelimiters = ['(', '['];

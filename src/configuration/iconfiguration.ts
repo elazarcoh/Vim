@@ -144,6 +144,10 @@ export interface IConfiguration {
    * Use EasyMotion plugin?
    */
   easymotion: boolean;
+  /**
+   * Use Leap plugin?
+   */
+  leap: boolean;
 
   /**
    * Use ReplaceWithRegister plugin?
@@ -194,6 +198,14 @@ export interface IConfiguration {
   easymotionDimBackground: boolean;
   easymotionMarkerFontWeight: string;
   easymotionKeys: string;
+
+  /**
+   * Leap marker appearance settings
+   */
+  leapShowMarkerPosition: "after" | "target";
+  leapLabels: string;
+  leapCaseSensitive: boolean;
+  leapBidirectionalSearch: boolean;
 
   /**
    * Timeout in milliseconds for remapped commands.
