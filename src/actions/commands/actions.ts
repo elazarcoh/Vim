@@ -1056,7 +1056,8 @@ class GoToDeclaration extends BaseCommand {
 
     if (vimState.editor === vscode.window.activeTextEditor) {
       // We didn't switch to a different editor
-      vimState.cursorStopPosition = vimState.editor.selection.start;
+      vimState.cursorStartPosition = vimState.editor.selection.start;
+      vimState.cursorStopPosition = vimState.editor.selection.end;
     }
   }
 }
@@ -1319,7 +1320,7 @@ class CommandTabNext extends BaseCommand {
     if (vimState.recordedState.count > 0) {
       new TabCommand({
         type: TabCommandType.Absolute,
-        count: vimState.recordedState.count - 1,
+        count: vimState.recordedState.count,
       }).execute(vimState);
     } else {
       new TabCommand({
@@ -2156,7 +2157,7 @@ class ActionDeleteLineVisualMode extends BaseCommand {
 
   public override doesActionApply(vimState: VimState, keysPressed: string[]): boolean {
     const leapSwitch = configuration.leap && !configuration.leapBidirectionalSearch;
-    return super.doesActionApply(vimState, keysPressed) && !leapSwitch
+    return super.doesActionApply(vimState, keysPressed) && !leapSwitch;
   }
 
   public override async exec(position: Position, vimState: VimState): Promise<void> {
